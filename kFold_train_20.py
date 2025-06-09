@@ -23,7 +23,7 @@ transform = transforms.Compose([
 #Loading the dataset
 dataset = torchvision.datasets.CIFAR10(root = './data', train = True, transform=transform,download=True)
 
-k = 5
+k = 3
 kf = KFold(n_splits=k, shuffle=True,random_state=42)
 
 indices = np.arange(len(dataset))
@@ -33,7 +33,7 @@ for fold, (train_idx, val_idx) in enumerate(kf.split(indices)):
     print(f"\n[INFO] Fold {fold+1}/5")
 
     train_idx = train_idx.tolist()
-    val_idx = val_idx.tolist() # because Subset expectd a 1-d array and the pixels are 2D
+    val_idx = val_idx.tolist() # because Subset expect a 1-d array and the pixels are 2D
     
     train_subset = Subset(dataset, train_idx)
     val_subset = Subset(dataset, val_idx)
@@ -56,8 +56,9 @@ for fold, (train_idx, val_idx) in enumerate(kf.split(indices)):
 
     train_loss_history = []
     train_acc_history=[]
+    val_acc_history = []
 
-    for eopch in range(config['epochs']):
+    for epoch in range(config['epochs']):
         model.train()
         current_loss = 0
         correct_preds=0
@@ -83,21 +84,38 @@ for fold, (train_idx, val_idx) in enumerate(kf.split(indices)):
         train_acc_history.append(epoch_acc)
 
         scheduler.step()
+
+        model.eval()
+        val_correct, val_total = 0, 0
+        with torch.no_grad():
+            for inputs, labels in valloader:
+                inputs, labels = inputs.to(device), labels.to(device)
+                outputs = model(inputs)
+                _, predicted = outputs.max(1)
+                val_total += labels.size(0)
+                val_correct += predicted.eq(labels).sum().item()
+
+        val_acc = 100. * val_correct / val_total
+        val_acc_history.append(val_acc)
+        print(f"Epoch {epoch+1}/{config['epochs']}, Train Acc: {epoch_acc:.2f}%, Val Acc: {val_acc:.2f}%")
     
     fold_name = f"fold{fold+1}"
-    fold_dir = f"trials/{fold_name}"
+    fold_dir = f"trials/trial_2/{fold_name}"
     os.makedirs(fold_dir, exist_ok=True)
 
     torch.save(model.state_dict(),os.path.join(fold_dir, "model.pth"))
 
-    #Plotting training loss and accuracy
+
+
+
+    #Plotting training loss and validation accuracy
 
     # Get all existing curve files
-    existing_files = os.listdir('visualizations')
+    existing_files = os.listdir('graphs')
     count = sum(1 for f in existing_files if f.startswith("training_curve_") and f.endswith(".png"))
 
     # Create new filename with count
-    filename = f"visualizations/training_curve_run{count+1}.png"
+    filename = f"graphs/training_curve_run{count+1}.png"
 
 
     epochs = range(1, len(train_loss_history) + 1)
@@ -112,14 +130,15 @@ for fold, (train_idx, val_idx) in enumerate(kf.split(indices)):
     plt.xticks(epochs)
 
     plt.subplot(1, 2, 2)
-    plt.plot(epochs, train_acc_history, label='Accuracy')
+    plt.plot(epochs, val_acc_history, label='Accuracy')
     plt.xlabel('Epoch')
     plt.ylabel('Accuracy (%)')
-    plt.title('Training Accuracy')
+    plt.title('Validation Accuracy')
     plt.xticks(epochs)
 
     plt.tight_layout()
     plt.savefig(filename)
+
     print(f"[INFO] Saved training curve to: {filename}")
 
 
