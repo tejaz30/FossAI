@@ -1,0 +1,22 @@
+#This file is used to seperately define the hyperparameter values to keep a clean code. 
+# It is also easier to keep the logs if all this information is one seperate document
+
+model_name: resent18
+num_classes: 10
+
+#Training settings
+epochs: 10
+batch_size: 64
+learning_rate: 0.001
+weight_decay: 0.00005
+
+#Optimizer and scheduler
+optimizer: adam
+scheduler: steplr
+step_size: 3
+gamma: 0.5
+
+
+#File path
+checkpoint_path: checkpoints/resnet18_cifar10.pth
+
