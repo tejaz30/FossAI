@@ -5,10 +5,10 @@ model_name: resent18
 num_classes: 10
 
 #Training settings
-epochs: 10 
+epochs: 5
 batch_size: 64
 learning_rate: 0.001
-weight_decay: 0.0005
+weight_decay: 0.00005
 
 #Optimizer and scheduler
 optimizer: adam
@@ -19,3 +19,4 @@ gamma: 0.5
 
 #File path
 checkpoint_path: checkpoints/resnet18_cifar10.pth
+

@@ -17,7 +17,7 @@ class BasicBlock(nn.Module):
                                stride=1, padding=1, bias=False)
         self.bn2 = nn.BatchNorm2d(out_channels)
 
-        # Shortcut connection to match dimensions incase of downsamping 
+        # Shortcut connection to match dimensions incase of downsampling 
         if stride != 1 or in_channels != out_channels:
             self.shortcut = nn.Sequential(
                 nn.AvgPool2d(kernel_size=1, stride=stride),
@@ -52,6 +52,7 @@ class ResNet(nn.Module):
         self.layer3 = self._make_layer(block, 64, num_blocks[2], stride=2)
 
         self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
+        self.dropout = nn.Dropout(0.5)
         self.fc = nn.Linear(64, num_classes)
 
         # Initialize weights
@@ -89,6 +90,7 @@ class ResNet(nn.Module):
 
         out = self.avgpool(out) #avg pooling the results instead of max pooling as the images of are not that huge to rule out some part of the image completely
         out = torch.flatten(out, 1)
+        out = self.dropout(out)
         out = self.fc(out)
         return F.log_softmax(out, dim=1)
 

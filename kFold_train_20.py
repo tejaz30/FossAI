@@ -50,7 +50,7 @@ for fold, (train_idx, val_idx) in enumerate(kf.split(indices)):
 
     criterion = nn.CrossEntropyLoss()
 
-    optimizer = optim.Adam(params=model.parameters(), lr = config['learning_rate'], weight_decay = config['weight_decay'])
+    optimizer = optim.Adam(params=model.parameters(), lr = config['learning_rate'], weight_decay = config['weight_decay'],)
 
     scheduler = optim.lr_scheduler.StepLR(optimizer = optimizer, step_size=config['step_size'],gamma=config['gamma'])
 
