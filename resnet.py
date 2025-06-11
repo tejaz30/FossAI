@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+
 class BasicBlock(nn.Module):
     def __init__(self, in_channels, out_channels, stride=1, use_shortcut=True):
         super().__init__()
@@ -37,7 +38,7 @@ class BasicBlock(nn.Module):
         return out
 
 class ResNet(nn.Module):
-    def __init__(self, block, num_blocks, num_classes=10, use_shortcuts=True):
+    def __init__(self, block, num_blocks, num_classes=10, use_shortcuts=True, dropout = 0.5):
         super().__init__()
         self.in_channels = 16
         self.use_shortcut = use_shortcuts
@@ -52,7 +53,7 @@ class ResNet(nn.Module):
         self.layer3 = self._make_layer(block, 64, num_blocks[2], stride=2)
 
         self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
-        self.dropout = nn.Dropout(0.5)
+        self.dropout = nn.Dropout(dropout)
         self.fc = nn.Linear(64, num_classes)
 
         # Initialize weights
@@ -94,7 +95,7 @@ class ResNet(nn.Module):
         out = self.fc(out)
         return F.log_softmax(out, dim=1)
 
-def resnet20():
+def resnet20(dropout = 0.5):
     # ResNet-20 for CIFAR-10 has 3 layers of 3 blocks each (total 20 layers)
     return ResNet(BasicBlock, [3, 3, 3])
 
