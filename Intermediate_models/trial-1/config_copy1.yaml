@@ -9,5 +9,7 @@ epochs: 10
 batch_size: 64
 learning_rate: 0.001
 
+#Optimzer = SGD
+
 #File path
 checkpoint_path: checkpoints/resnet18_cifar10.pth

@@ -12,31 +12,41 @@ import numpy as np
 import matplotlib.pyplot as plt
 from resnet import resnet20
 
-with open("config.yaml","r") as file:
+with open("best_config.yaml","r") as file:
     config = yaml.safe_load(file)
 
 transform = transforms.Compose([
     transforms.ToTensor()
     
 ])
+transform_train = transforms.Compose([
+    transforms.RandomHorizontalFlip(),
+    transforms.RandomCrop(32,padding=4),
+    transforms.ToTensor(),
+    ])
 
 #Loading the dataset
-dataset = torchvision.datasets.CIFAR10(root = './data', train = True, transform=transform,download=True)
+train_dataset = torchvision.datasets.CIFAR10(root = './data', train = True, transform=transform_train,download=True)
+val_dataset = torchvision.datasets.CIFAR10(root = './data', train = True, transform=transform,download=True)
 
 k = 3
 kf = KFold(n_splits=k, shuffle=True,random_state=42)
 
-indices = np.arange(len(dataset))
+indices = np.arange(len(train_dataset))
 all_accuracies = []
 
 for fold, (train_idx, val_idx) in enumerate(kf.split(indices)):
-    print(f"\n[INFO] Fold {fold+1}/5")
+    print(f"\n[INFO] Fold {fold+1}/3")
 
     train_idx = train_idx.tolist()
-    val_idx = val_idx.tolist() # because Subset expect a 1-d array and the pixels are 2D
-    
-    train_subset = Subset(dataset, train_idx)
-    val_subset = Subset(dataset, val_idx)
+    val_idx = val_idx.tolist() 
+
+    #These were initially defined as numpy arrays which held the indices of each datapoint which were split into training ad validation for that fold
+    #No we are converting them to a Python list because that is the datatype expected by the Subset function
+
+
+    train_subset = Subset(train_dataset, train_idx)
+    val_subset = Subset(val_dataset, val_idx)
     
     trainloader = DataLoader(train_subset, batch_size=config['batch_size'], shuffle=True, num_workers=2)
     valloader = DataLoader(val_subset, batch_size=config['batch_size'], shuffle=False, num_workers=2)
@@ -100,7 +110,7 @@ for fold, (train_idx, val_idx) in enumerate(kf.split(indices)):
         print(f"Epoch {epoch+1}/{config['epochs']}, Train Acc: {epoch_acc:.2f}%, Val Acc: {val_acc:.2f}%")
     
     fold_name = f"fold{fold+1}"
-    fold_dir = f"trials/trial_2/{fold_name}"
+    fold_dir = f"trials/2_try/{fold_name}"
     os.makedirs(fold_dir, exist_ok=True)
 
     torch.save(model.state_dict(),os.path.join(fold_dir, "model.pth"))
@@ -111,11 +121,10 @@ for fold, (train_idx, val_idx) in enumerate(kf.split(indices)):
     #Plotting training loss and validation accuracy
 
     # Get all existing curve files
-    existing_files = os.listdir('graphs')
-    count = sum(1 for f in existing_files if f.startswith("training_curve_") and f.endswith(".png"))
+    # existing_files = os.listdir('graphs')
+    # count = sum(1 for f in existing_files if f.startswith("training_curve_") and f.endswith(".png"))
 
     # Create new filename with count
-    filename = f"graphs/training_curve_run{count+1}.png"
 
 
     epochs = range(1, len(train_loss_history) + 1)
@@ -136,10 +145,18 @@ for fold, (train_idx, val_idx) in enumerate(kf.split(indices)):
     plt.title('Validation Accuracy')
     plt.xticks(epochs)
 
-    plt.tight_layout()
-    plt.savefig(filename)
 
-    print(f"[INFO] Saved training curve to: {filename}")
+    plt.subplot(1, 2, 2)
+    plt.plot(epochs, train_acc_history, label='Accuracy')
+    plt.xlabel('Epoch')
+    plt.ylabel('Accuracy (%)')
+    plt.title('Training Accuracy')
+    plt.xticks(epochs)
+
+    plt.tight_layout()
+    graph_path = os.path.join(fold_dir, f"training_curve.png")
+    plt.savefig(graph_path)
+    print(f"[INFO] Saved training curve to: {graph_path}")
 
 
 

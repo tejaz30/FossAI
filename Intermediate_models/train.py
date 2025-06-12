@@ -16,7 +16,6 @@ with open("config.yaml", "r") as file:
 
 
 
-
 # Data transformations  
 transform_train = transforms.Compose([ # Compose builds a pipeline
     transforms.ToTensor()

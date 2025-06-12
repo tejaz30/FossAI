@@ -147,11 +147,20 @@ for trial in range(n_trials):
         plt.title('Training Loss')
         plt.xticks(epochs)
 
+
+
         plt.subplot(1, 2, 2)
         plt.plot(epochs, val_acc_history, label='Accuracy')
         plt.xlabel('Epoch')
         plt.ylabel('Accuracy (%)')
         plt.title('Validation Accuracy')
+        plt.xticks(epochs)
+
+        plt.subplot(1, 2, 2)
+        plt.plot(epochs, train_acc_history, label='Accuracy')
+        plt.xlabel('Epoch')
+        plt.ylabel('Accuracy (%)')
+        plt.title('Training Accuracy')
         plt.xticks(epochs)
 
         plt.tight_layout()
