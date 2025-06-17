@@ -9,6 +9,10 @@ env/
 ENV/
 .venv/
 
+# PyTorch checkpoints / model weights
+*.pth
+checkpoints/
+
 # Data files and datasets
 *.tar.gz
 *.zip
@@ -16,7 +20,9 @@ data/
 datasets/
 *.pt
 
-
+# Matplotlib / plotting files
+*.png
+visualizations/
 
 # Log files
 *.log
