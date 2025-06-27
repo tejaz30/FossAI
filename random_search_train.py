@@ -35,23 +35,37 @@ def sample_config(space):
     }
 
 # Data transforms
+
+mean = (0.4914, 0.4822, 0.4465)
+std = (0.2023, 0.1994, 0.2010)
+
 transform = transforms.Compose([
-    transforms.ToTensor()
+    transforms.ToTensor(),
+    transforms.Normalize(mean,std)
 ])
+
+
 transform_train = transforms.Compose([
     transforms.RandomHorizontalFlip(),
     transforms.RandomCrop(32, padding=4),
-    transforms.ToTensor()
+    transforms.ToTensor(),
+    transforms.Normalize(mean,std)
+
+   
 ])
 
 # Load CIFAR10 dataset
 train_dataset = torchvision.datasets.CIFAR10(root='./data', train=True, transform=transform_train, download=True)
 val_dataset = torchvision.datasets.CIFAR10(root='./data', train=True, transform=transform, download=True)
 
+
+#Settings for the K-fold cross-validation
 k = 3
 kf = KFold(n_splits=k, shuffle=True, random_state=42)
 indices = np.arange(len(train_dataset))
 
+
+# Setting for the Random search for hyperparameter fine-tuning
 n_trials = 5
 
 best_trial = None
@@ -59,12 +73,12 @@ best_val = 0
 
 for trial in range(n_trials):
     print(f"\n[INFO] Starting Trial {trial + 1}/{n_trials}")
-    config = sample_config(search_space)  
+    config = sample_config(search_space)
 
     trial_dir = f"trials/trial_{trial + 1}"
     os.makedirs(trial_dir, exist_ok=True)
 
-    # Save the used config
+    # Saves the used config into a yaml file
     with open(os.path.join(trial_dir, "config_used.yaml"), "w") as f:
         yaml.dump(config, f)
 
@@ -172,6 +186,7 @@ for trial in range(n_trials):
     avg_val_acc = sum(all_val_accs) / len(all_val_accs)
     with open(os.path.join(trial_dir, "val_score.txt"), "w") as f:
         f.write(f"Average Validation Accuracy: {avg_val_acc:.2f}%\n")
+    
 
 
 
@@ -179,7 +194,7 @@ for trial in range(n_trials):
     if avg_val_acc > best_val:
         best_val = avg_val_acc
         best_trial = config.copy()
-        best_trial['trial_dir'] = trial_dir  # Optional: track where this config was run
+        best_trial['trial_dir'] = trial_dir
 
 # Save best config after all trials
 if best_trial:

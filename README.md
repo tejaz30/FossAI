@@ -59,7 +59,6 @@ RESNET_CIFAR10/
 │   │   └── trial_5/
 │   └── 2_try/
 │
-├── visualizations/               # Training loss/accuracy plots
 ├── inference.py                  # Model inference on test images
 ├── kFold_train_20.py             # K-Fold cross-validation training script
 ├── random_search_train.py        # Hyperparameter tuning using random search
