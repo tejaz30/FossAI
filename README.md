@@ -28,11 +28,7 @@ This architecture allows training of very deep networks (50, 101, 152+ layers) w
 | `exp1_no_weight_decay`  | SGD       | ❌           | ❌           | ~58%       | Baseline                            |
 | `exp2_with_wd_scheduler`| Adam      | ✅           | StepLR       | ~65%       | Improved generalization             |
 | `exp3_kfold`            | Adam      | ✅           | StepLR       | ~75% (avg across folds) | Better model stability |
-| 'exp4_random_search`    | Adam      | ✅           | StepLR       | ~78%       | Hyperparameter Tuning              |
-
-📊 Training accuracy and loss curves are saved after each run in `/trials/1_try`.
-
-📂 Checkpoints for trained models are saved in `/checkpoints`.
+| 'exp4_random_search`    | Adam      | ✅           | StepLR       | ~78%       | Hyperparameter Tuning               |
 
 ---
 

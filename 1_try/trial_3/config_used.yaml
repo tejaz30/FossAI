@@ -1,8 +1,0 @@
-batch_size: 32
-dropout: 0.5
-epochs: 15
-gamma: 0.5
-learning_rate: 0.001
-num_classes: 10
-step_size: 3
-weight_decay: 0.0001

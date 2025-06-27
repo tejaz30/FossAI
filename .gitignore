@@ -13,6 +13,13 @@ ENV/
 *.pth
 checkpoints/
 
+#unwanted files
+1_try/
+final_model/
+graphs/
+
+test.py
+
 # Data files and datasets
 *.tar.gz
 *.zip

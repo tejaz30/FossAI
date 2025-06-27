@@ -1,2 +1,0 @@
-The changes in this were made to address the problem of overfitting that was occuring once the epochs were increased. The training accuracy reached very high but the validation sort of plataued. 
-So to adress this, I've increased the weight decay and I have implemented dropout method just before the fully connected layer. This  has made it better but did not completely solve the issue.
