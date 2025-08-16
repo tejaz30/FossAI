@@ -11,11 +11,12 @@ from tqdm import tqdm
 import matplotlib.pyplot as plt
 from resnet import resnet20
 
-# ====================== Load best config ======================
+# Load best config
 with open("best_config.yaml", "r") as file:
     config = yaml.safe_load(file)
 
-# ====================== Data Transforms ======================
+# Data Transformations
+# Normalization values for CIFAR-10 dataset
 mean = (0.4914, 0.4822, 0.4465)
 std = (0.2023, 0.1994, 0.2010)
 
@@ -26,13 +27,13 @@ transform_train = transforms.Compose([
     transforms.Normalize(mean, std)
 ])
 
-# (fix) transform_test should include ToTensor before Normalize
+
 transform_test = transforms.Compose([
     transforms.ToTensor(),
     transforms.Normalize(mean, std)
 ])
 
-# ====================== Load Dataset ======================
+# Dataset Loading
 train_dataset = torchvision.datasets.CIFAR10(
     root='./data', train=True, transform=transform_train, download=True
 )
@@ -44,7 +45,7 @@ train_loader = DataLoader(
     num_workers=2
 )
 
-# ====================== Model Setup ======================
+#Model Initialization
 model = resnet20(dropout=config['dropout'])
 model.fc = nn.Linear(model.fc.in_features, config['num_classes'])
 
@@ -63,7 +64,7 @@ scheduler = optim.lr_scheduler.StepLR(
     gamma=config['gamma']
 )
 
-# ====================== Training ======================
+#Training Loop
 for epoch in range(config['epochs']):
     model.train()
     current_loss = 0
@@ -88,7 +89,7 @@ for epoch in range(config['epochs']):
     accuracy = 100 * correct_preds / total
     print(f"Epoch [{epoch + 1}/{config['epochs']}], Loss: {current_loss:.4f}, Accuracy: {accuracy:.2f}%")
 
-# ====================== Save Final Model ======================
+# Saving the final model
 checkpoint_path = 'resnet_cifar10/final_model.pth'
 os.makedirs(os.path.dirname(checkpoint_path), exist_ok=True)
 torch.save(model.state_dict(), checkpoint_path)

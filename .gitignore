@@ -19,6 +19,7 @@ final_model/
 graphs/
 
 test.py
+final_train.py
 
 # Data files and datasets
 *.tar.gz

@@ -9,6 +9,7 @@ from torch.utils.data import DataLoader
 from torchvision import models
 from tqdm import tqdm
 import matplotlib.pyplot as plt
+from resnet import resnet20
 
 # Load config.yaml 
 with open("config.yaml", "r") as file:
@@ -35,7 +36,7 @@ testloader = DataLoader(testset, batch_size=config['batch_size'], shuffle=False,
 
 
 # Model Loading 
-model = models.resnet18(pretrained=False)
+model = models.resnet18(pretrained = False)
 model.fc = nn.Linear(model.fc.in_features, config['num_classes']) 
 #This is changing the architecture of the final fully connected layer of the neural network, 
 # we need to this as the original resent model is trained on 1000 classes and we need to change it according to the cifaar-10 dataset

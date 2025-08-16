@@ -55,9 +55,12 @@ transform_train = transforms.Compose([
 ])
 
 # Load CIFAR10 dataset
-train_dataset = torchvision.datasets.CIFAR10(root='./data', train=True, transform=transform_train, download=True)
+train_dataset = torchvision.datasets.CIFAR10(root='./data', train=True, transform=transform_train, download=True) 
 val_dataset = torchvision.datasets.CIFAR10(root='./data', train=True, transform=transform, download=True)
 
+'''we load the dataset twice, once for training and once for validation, as we are using K-fold cross-validation 
+ and also because we need to apply different transformations for training and validation
+'''
 
 #Settings for the K-fold cross-validation
 k = 3
@@ -112,6 +115,8 @@ for trial in range(n_trials):
             correct_preds = 0
             total = 0
 
+            #basic training loop
+
             for inputs, labels in trainloader:
                 inputs, labels = inputs.to(device), labels.to(device)
                 optimizer.zero_grad()
@@ -124,6 +129,8 @@ for trial in range(n_trials):
                 _, predicted = outputs.max(1)
                 total += labels.size(0)
                 correct_preds += predicted.eq(labels).sum().item()
+            
+            # Calculate average loss and accuracy for the epoch
 
             epoch_loss = current_loss / len(trainloader)
             epoch_acc = 100. * correct_preds / total
